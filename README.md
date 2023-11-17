@@ -16,6 +16,7 @@ Cross Build System for ISPR-3.0/4.0
 
 * [https://www.python.org/](https://www.python.org/)
 
+Use pip.
 
     pip install git+https://github.com/tantanGH/xmkisd.git
 
