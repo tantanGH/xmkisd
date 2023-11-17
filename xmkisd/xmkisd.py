@@ -440,7 +440,7 @@ def main():
 
   parser = argparse.ArgumentParser()
   parser.add_argument("src_file", help="source movie file")
-  parser.add_argument("isd_name", help="target isd file name")
+  parser.add_argument("isd_name", help="target isd base name")
   parser.add_argument("-fps", help="frame per second", type=int, default=12, choices=[6,10,12,15,20,30])
   parser.add_argument("-co", "--src_cut_ofs", help="source cut start offset", default="00:00:00.000")
   parser.add_argument("-cl", "--src_cut_len", help="source cut length", default="01:00:00.000")
@@ -461,8 +461,11 @@ def main():
   output_bmp_dir = "output_bmp"
 
   isd_data_file = f"{args.isd_name}"
-  if isd_data_file[-4:].upper() != ".ISD":
-    isd_data_file += ".ISD"
+  if isd_data_file[-4:].upper() != ".ISD" and isd_data_file[-4:].upper() != ".ISM":
+    if args.pcm_freq == 15625:
+      isd_data_file += ".ISD"
+    else:
+      isd_data_file += ".ISM"
 
   if args.pcm_freq == 15625:
     pcm_wip_file = f"_wip_pcm.dat"
