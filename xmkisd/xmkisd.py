@@ -260,9 +260,9 @@ class BMPtoISD:
       elif pcm_freq == 32000:     # S32
         pcm_rate_type = 0b10011111
       elif pcm_freq == 44100:     # S44
-        pcm_rate_type = 0x10101111
+        pcm_rate_type = 0b10101111
       elif pcm_freq == 48000:     # S48
-        pcm_rate_type = 0x10111111
+        pcm_rate_type = 0b10111111
 
       if pcm_freq == 15625:
         f.write("ISPR-V3.0\x00".encode('ascii'))
