@@ -238,14 +238,14 @@ class BMPtoISD:
       if pcm_freq == 15625:
         frame_voice_size = 7800 // fps
       elif pcm_freq == 32000:
-        if fps == 6 or fps == 12:
-          frame_voice_size = 63996 // fps * 2     # 6/12fps
+        if fps == 6 or fps == 12 or fps == 24:
+          frame_voice_size = 64008 // fps * 2     # 24fps
         elif fps == 15 or fps == 30:
           frame_voice_size = 63990 // fps * 2     # 15/30fps
         else:
           frame_voice_size = 64000 // fps * 2     # 10/20fps
       else:
-        frame_voice_size = pcm_freq // fps * 4
+        frame_voice_size = pcm_freq * 4 // fps
 
       frame_size = ( 1 + ( view_width * view_height * 2 + frame_voice_size ) // 1024 ) * 1024
       header_size = 1024
@@ -270,8 +270,12 @@ class BMPtoISD:
         f.write("ISPR-V4.0\x00".encode('ascii'))
       f.write(view_width.to_bytes(4, 'big'))
       f.write(view_height.to_bytes(4, 'big'))
-      f.write((60 // fps).to_bytes(4, 'big'))
-      f.write((60 // fps).to_bytes(4, 'big'))
+      if fps == 24:
+        f.write((60 // 30).to_bytes(4, 'big'))
+        f.write((60 // 20).to_bytes(4, 'big'))
+      else:
+        f.write((60 // fps).to_bytes(4, 'big'))
+        f.write((60 // fps).to_bytes(4, 'big'))
       f.write(pcm_rate_type.to_bytes(4, 'big'))
       f.write(frame_size.to_bytes(4, 'big'))
       f.write(header_size.to_bytes(4, 'big'))
@@ -440,15 +444,15 @@ def main():
 
   parser = argparse.ArgumentParser()
   parser.add_argument("src_file", help="source movie file")
-  parser.add_argument("isd_name", help="target isd base name")
-  parser.add_argument("-fps", help="frame per second", type=int, default=12, choices=[6,10,12,15,20,30])
+  parser.add_argument("isd_name", help="target isd name")
+  parser.add_argument("-fps", help="frame per second", type=int, default=15, choices=[6,10,12,15,20,24,30])
   parser.add_argument("-co", "--src_cut_ofs", help="source cut start offset", default="00:00:00.000")
   parser.add_argument("-cl", "--src_cut_len", help="source cut length", default="01:00:00.000")
-  parser.add_argument("-vw", "--view_width", help="view width", type=int, default=200)
-  parser.add_argument("-vh", "--view_height", help="view height", type=int, default=156)
+  parser.add_argument("-vw", "--view_width", help="view width", type=int, default=216)
+  parser.add_argument("-vh", "--view_height", help="view height", type=int, default=168)
   parser.add_argument("-pv", "--pcm_volume", help="pcm volume", type=float, default=1.0)
-  parser.add_argument("-pp", "--pcm_peak_max", help="pcm peak max", type=float, default=98.0)
-  parser.add_argument("-pa", "--pcm_avg_min", help="pcm average min", type=float, default=8.5)
+  parser.add_argument("-pp", "--pcm_peak_max", help="pcm peak max", type=float, default=98.5)
+  parser.add_argument("-pa", "--pcm_avg_min", help="pcm average min", type=float, default=8.0)
   parser.add_argument("-pf", "--pcm_freq", help="pcm frequency", type=int, default=15625, choices=[15625, 22050, 24000, 32000, 44100, 48000])
   parser.add_argument("-ib", "--use_ibit", help="use i bit for color reduction", action='store_true')
   parser.add_argument("-db", "--deband", help="use debanding filter", action='store_true')
@@ -467,12 +471,8 @@ def main():
     else:
       isd_data_file += ".ISM"
 
-  if args.pcm_freq == 15625:
-    pcm_wip_file = f"_wip_pcm.dat"
-    adpcm_wip_file = f"_wip_adpcm.dat"
-  else:
-    pcm_wip_file = f"_wip_pcm.dat"
-    adpcm_wip_file = None
+  pcm_wip_file = f"_wip_pcm.dat"
+  adpcm_wip_file = f"_wip_adpcm.dat" if args.pcm_freq == 15625 else None
 
   if stage1(args.src_file, args.src_cut_ofs, args.src_cut_len, \
             args.pcm_volume, args.pcm_peak_max, args.pcm_avg_min, args.pcm_freq, pcm_wip_file, adpcm_wip_file) != 0:
