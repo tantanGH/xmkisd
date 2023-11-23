@@ -427,11 +427,11 @@ def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, vie
 #
 #  stage 3 bmp/pcm to isd
 #
-def stage3(output_bmp_dir, view_width, view_height, use_ibit, fps, pcm_freq, pcm_wip_file, adpcm_wip_file, comment, isd_data_file):
+def stage3(output_bmp_dir, view_width, view_height, use_ibit, fps, square_mode, pcm_freq, pcm_wip_file, adpcm_wip_file, comment, isd_data_file):
 
   print("[STAGE 3] started.")
 
-  if BMPtoISD().convert(isd_data_file, output_bmp_dir, view_width, view_height, use_ibit, fps, pcm_freq, pcm_wip_file, adpcm_wip_file, comment) != 0:
+  if BMPtoISD().convert(isd_data_file, output_bmp_dir, view_width, view_height, use_ibit, fps, square_mode, pcm_freq, pcm_wip_file, adpcm_wip_file, comment) != 0:
     print("error: BMP/PCM to ISD conversion failed.")
     return 1
   
