@@ -203,7 +203,7 @@ class ADPCM:
 #
 class BMPtoISD:
  
-  def convert(self, output_file, src_image_dir, view_width, view_height, use_ibit, fps, \
+  def convert(self, output_file, src_image_dir, view_width, view_height, use_ibit, fps, square_mode, \
               pcm_freq, pcm_wip_file, adpcm_wip_file, comment):
 
     rc = 0
@@ -220,20 +220,14 @@ class BMPtoISD:
         with open(pcm_wip_file, "rb") as pf:
           pcm_data = pf.read()
 
-#      print(f"pcm data len = {len(pcm_data)}")
-
       bmp_files = sorted(os.listdir(src_image_dir))
       num_frames = len(bmp_files)
       written_frames = 0
 
-#      print(f"num of frames = {num_frames}")
-
-      screen_width = 256
+      screen_width = 384 if square_mode else 256
       screen_height = 256
       ofs_x = ( screen_width - view_width ) // 2
       ofs_y = ( screen_height - view_height ) // 2
-
-#      print(f"ofs_x = {ofs_x}, ofs_y = {ofs_y}")
 
       if pcm_freq == 15625:
         frame_voice_size = 7800 // fps
@@ -372,7 +366,7 @@ def stage1(src_file, src_cut_ofs, src_cut_len, \
 #
 #  stage2 mov to bmp
 #
-def stage2(src_file, src_cut_ofs, src_cut_len, fps, view_width, view_height, deband, sharpness, output_bmp_dir):
+def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, view_height, deband, sharpness, output_bmp_dir):
 
   print("[STAGE 2] started.")
 
@@ -380,15 +374,23 @@ def stage2(src_file, src_cut_ofs, src_cut_len, fps, view_width, view_height, deb
     print("error: view_width must be 8 * n")
     return 1
 
+  if square_mode and view_width % 32 != 0:
+    print("error: view_width must be 32 * n")
+    return 1
+
   if view_width < 128:
     print("error: view_width is too small.")
     return 1
 
-  if view_width > 256:
+  if square_mode is False and view_width > 256:
     print("error: view_width is too large.")
     return 1
 
-  if view_height > 240:
+  if square_mode and view_width > 384:
+    print("error: view_width is too large.")
+    return 1
+
+  if view_height > 256:
     print("error: view_height is too large.")
     return 1
 
@@ -450,6 +452,7 @@ def main():
   parser.add_argument("-cl", "--src_cut_len", help="source cut length", default="01:00:00.000")
   parser.add_argument("-vw", "--view_width", help="view width", type=int, default=216)
   parser.add_argument("-vh", "--view_height", help="view height", type=int, default=168)
+  parser.add_argument("-sq", "--square_mode", help="square pixel mode", action='store_true')
   parser.add_argument("-pv", "--pcm_volume", help="pcm volume", type=float, default=1.0)
   parser.add_argument("-pp", "--pcm_peak_max", help="pcm peak max", type=float, default=98.5)
   parser.add_argument("-pa", "--pcm_avg_min", help="pcm average min", type=float, default=8.0)
@@ -465,8 +468,10 @@ def main():
   output_bmp_dir = "output_bmp"
 
   isd_data_file = f"{args.isd_name}"
-  if isd_data_file[-4:].upper() != ".ISD" and isd_data_file[-4:].upper() != ".ISM":
-    if args.pcm_freq == 15625:
+  if isd_data_file[-4:].upper() not in [".ISD", ".ISM", ".ISS"]: 
+    if args.square_mode:
+      isd_data_file += ".ISS"
+    elif args.pcm_freq == 15625:
       isd_data_file += ".ISD"
     else:
       isd_data_file += ".ISM"
@@ -479,7 +484,7 @@ def main():
     return 1
   
   if stage2(args.src_file, args.src_cut_ofs, args.src_cut_len, \
-            args.fps, args.view_width, args.view_height, args.deband, args.sharpness, \
+            args.fps, args.square_mode, args.view_width, args.view_height, args.deband, args.sharpness, \
             output_bmp_dir) != 0:
     return 1
 
