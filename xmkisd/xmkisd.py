@@ -488,8 +488,8 @@ def main():
             output_bmp_dir) != 0:
     return 1
 
-  if stage3(output_bmp_dir, args.view_width, args.view_height, args.use_ibit, args.fps, args.pcm_freq, \
-            pcm_wip_file, adpcm_wip_file, args.comment, isd_data_file):
+  if stage3(output_bmp_dir, args.view_width, args.view_height, args.use_ibit, args.fps, args.square_mode, \
+            args.pcm_freq, pcm_wip_file, adpcm_wip_file, args.comment, isd_data_file):
     return 1
 
   if pcm_wip_file:
