@@ -230,16 +230,37 @@ class BMPtoISD:
       ofs_y = ( screen_height - view_height ) // 2
 
       if pcm_freq == 15625:
-        frame_voice_size = 7800 // fps
+        if fps == 18:
+          frame_voice_size = 7812 // fps
+        elif fps == 22 or fps == 27.5:
+          frame_voice_size = 7810 // fps
+        else:
+          frame_voice_size = 7800 // fps
       elif pcm_freq == 32000:
-        if fps == 6 or fps == 12 or fps == 24:
+        if fps == 6 or fps == 12 or fps == 18 or fps == 24:
           frame_voice_size = 64008 // fps * 2     # 24fps
         elif fps == 15 or fps == 30:
           frame_voice_size = 63990 // fps * 2     # 15/30fps
+        elif fps == 22:
+          frame_voice_size = 63998 // fps * 2
+        elif fps == 27.5:
+          frame_voice_size = 64020 // fps * 2
         else:
           frame_voice_size = 64000 // fps * 2     # 10/20fps
-      else:
-        frame_voice_size = pcm_freq * 4 // fps
+      elif pcm_freq == 44100:
+        if fps == 22 or fps == 27.5:
+          frame_voice_size = 44110 // fps * 4
+        else:
+          frame_voice_size = pcm_freq * 4 // fps
+      elif pcm_freq == 48000:
+        if fps == 18:
+          frame_voice_size = 48006 // fps * 4
+        elif fps == 22:
+          frame_voice_size = 48004 // fps * 4
+        elif fps == 27.5:
+          frame_voice_size = 48015 // fps * 4
+        else:
+          frame_voice_size = pcm_freq * 4 // fps
 
       frame_size = ( 1 + ( view_width * view_height * 2 + frame_voice_size ) // 1024 ) * 1024
       header_size = 1024
@@ -264,9 +285,12 @@ class BMPtoISD:
         f.write("ISPR-V4.0\x00".encode('ascii'))
       f.write(view_width.to_bytes(4, 'big'))
       f.write(view_height.to_bytes(4, 'big'))
-      if fps == 24:
+      if fps == 22 or fps == 24 or fps == 27.5:
         f.write((60 // 30).to_bytes(4, 'big'))
         f.write((60 // 20).to_bytes(4, 'big'))
+      elif fps == 18:
+        f.write((60 // 20).to_bytes(4, 'big'))
+        f.write((60 // 15).to_bytes(4, 'big'))        
       else:
         f.write((60 // fps).to_bytes(4, 'big'))
         f.write((60 // fps).to_bytes(4, 'big'))
@@ -447,7 +471,7 @@ def main():
   parser = argparse.ArgumentParser()
   parser.add_argument("src_file", help="source movie file")
   parser.add_argument("isd_name", help="target isd name")
-  parser.add_argument("-fps", help="frame per second", type=int, default=15, choices=[6,10,12,15,20,24,30])
+  parser.add_argument("-fps", help="frame per second", type=float, default=15, choices=[6,10,12,15,18,20,22,24,27.5,30])
   parser.add_argument("-co", "--src_cut_ofs", help="source cut start offset", default="00:00:00.000")
   parser.add_argument("-cl", "--src_cut_len", help="source cut length", default="01:00:00.000")
   parser.add_argument("-vw", "--view_width", help="view width", type=int, default=216)
