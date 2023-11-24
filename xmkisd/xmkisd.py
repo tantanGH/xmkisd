@@ -236,6 +236,22 @@ class BMPtoISD:
           frame_voice_size = 7810 // fps
         else:
           frame_voice_size = 7800 // fps
+      elif pcm_freq == 22050:
+        if fps == 22:
+          frame_voice_size = 22044 // fps * 4
+        elif fps == 27.5:
+          frame_voice_size = 22055 // fps * 4
+        else:
+          frame_voice_size = pcm_freq * 4 // fps
+      elif pcm_freq == 24000:
+        if fps == 18:
+          frame_voice_size = 24012 // fps * 4
+        elif fps == 22:
+          frame_voice_size = 24002 // fps * 4
+        elif fps == 27.5:
+          frame_voice_size = 23980 // fps * 4
+        else:
+          frame_voice_size = pcm_freq * 4 // fps
       elif pcm_freq == 32000:
         if fps == 6 or fps == 12 or fps == 18 or fps == 24:
           frame_voice_size = 64008 // fps * 2     # 24fps
