@@ -398,10 +398,6 @@ def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, vie
     print("error: view_width must be 8 * n")
     return 1
 
-  if square_mode and view_width % 32 != 0:
-    print("error: view_width must be 32 * n")
-    return 1
-
   if view_width < 128:
     print("error: view_width is too small.")
     return 1
