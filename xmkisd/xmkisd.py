@@ -232,15 +232,17 @@ class BMPtoISD:
       if pcm_freq == 15625:
         if fps == 18:
           frame_voice_size = 7812 // fps
-        elif fps == 22 or fps == 27.5:
+        elif fps == 22:
           frame_voice_size = 7810 // fps
+        elif fps == 27:
+          frame_voice_size = 7803 // fps
         else:
           frame_voice_size = 7800 // fps
       elif pcm_freq == 22050:
         if fps == 22:
           frame_voice_size = 22044 // fps * 4
-        elif fps == 27.5:
-          frame_voice_size = 22055 // fps * 4
+        elif fps == 27:
+          frame_voice_size = 22059 // fps * 4
         else:
           frame_voice_size = pcm_freq * 4 // fps
       elif pcm_freq == 24000:
@@ -248,24 +250,24 @@ class BMPtoISD:
           frame_voice_size = 24012 // fps * 4
         elif fps == 22:
           frame_voice_size = 24002 // fps * 4
-        elif fps == 27.5:
-          frame_voice_size = 23980 // fps * 4
+        elif fps == 27:
+          frame_voice_size = 24003 // fps * 4
         else:
           frame_voice_size = pcm_freq * 4 // fps
       elif pcm_freq == 32000:
         if fps == 6 or fps == 12 or fps == 18 or fps == 24:
           frame_voice_size = 64008 // fps * 2     # 24fps
-        elif fps == 15 or fps == 30:
+        elif fps == 15 or fps == 27 or fps == 30:
           frame_voice_size = 63990 // fps * 2     # 15/30fps
         elif fps == 22:
           frame_voice_size = 63998 // fps * 2
-        elif fps == 27.5:
-          frame_voice_size = 64020 // fps * 2
         else:
           frame_voice_size = 64000 // fps * 2     # 10/20fps
       elif pcm_freq == 44100:
-        if fps == 22 or fps == 27.5:
+        if fps == 22:
           frame_voice_size = 44110 // fps * 4
+        elif fps == 27:
+          frame_voice_size = 44091 // fps * 4
         else:
           frame_voice_size = pcm_freq * 4 // fps
       elif pcm_freq == 48000:
@@ -273,8 +275,8 @@ class BMPtoISD:
           frame_voice_size = 48006 // fps * 4
         elif fps == 22:
           frame_voice_size = 48004 // fps * 4
-        elif fps == 27.5:
-          frame_voice_size = 48015 // fps * 4
+        elif fps == 27:
+          frame_voice_size = 48006 // fps * 4
         else:
           frame_voice_size = pcm_freq * 4 // fps
 
@@ -483,7 +485,7 @@ def main():
   parser = argparse.ArgumentParser()
   parser.add_argument("src_file", help="source movie file")
   parser.add_argument("isd_name", help="target isd name")
-  parser.add_argument("-fps", help="frame per second", type=float, default=15, choices=[6,10,12,15,18,20,22,24,27.5,30])
+  parser.add_argument("-fps", help="frame per second", type=int, default=15, choices=[6,10,12,15,18,20,22,24,27,30])
   parser.add_argument("-co", "--src_cut_ofs", help="source cut start offset", default="00:00:00.000")
   parser.add_argument("-cl", "--src_cut_len", help="source cut length", default="01:00:00.000")
   parser.add_argument("-vw", "--view_width", help="view width", type=int, default=216)
