@@ -240,7 +240,7 @@ class BMPtoISD:
           frame_voice_size = 7800 // fps
       elif pcm_freq == 22050:
         if fps == 22:
-          frame_voice_size = 22044 // fps * 4
+          frame_voice_size = 22066 // fps * 4
         elif fps == 27:
           frame_voice_size = 22059 // fps * 4
         else:
@@ -267,7 +267,7 @@ class BMPtoISD:
         if fps == 22:
           frame_voice_size = 44110 // fps * 4
         elif fps == 27:
-          frame_voice_size = 44091 // fps * 4
+          frame_voice_size = 44118 // fps * 4
         else:
           frame_voice_size = pcm_freq * 4 // fps
       elif pcm_freq == 48000:
@@ -412,8 +412,8 @@ def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, vie
 
   print("[STAGE 2] started.")
 
-  if view_width % 8 != 0:
-    print("error: view_width must be 8 * n")
+  if view_width % 4 != 0:
+    print("error: view_width must be 4 * n")
     return 1
 
   if view_width < 128:
