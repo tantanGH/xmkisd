@@ -296,7 +296,7 @@ class BMPtoISD:
         else:
           frame_voice_size = pcm_freq // fps * 4
 
-      frame_size = ( 1 + ( view_width * view_height * 2 + frame_voice_size ) // 1024 ) * 1024
+      frame_size = ( 1 + ( 16 + view_width * view_height * 2 + 2 + frame_voice_size ) // 1024 ) * 1024
       header_size = 1024
 
       written_pcm_size = 0
