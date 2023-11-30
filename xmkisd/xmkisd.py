@@ -376,9 +376,9 @@ class BMPtoISD:
           f.write(y_delta.to_bytes(4, 'big'))
           f.write(y_copy.to_bytes(4, 'big'))
           f.write(grm_bytes)
-          f.write(frame_voice_size.to_bytes(2, 'big'))
 
           frame_pcm_data = pcm_data[written_pcm_size : written_pcm_size + frame_voice_size]
+          f.write((len(frame_pcm_data)).to_bytes(2, 'big'))
           f.write(frame_pcm_data)
           f.write(bytes([0] * (frame_size - 16 - len(grm_bytes) - 2 - len(frame_pcm_data))))
 
