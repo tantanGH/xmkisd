@@ -239,12 +239,16 @@ class BMPtoISD:
         else:
           frame_voice_size = 7800 // fps
       elif pcm_freq == 22050:
-        if fps == 22:
-          frame_voice_size = 22066 // fps * 4
+        if fps == 20:
+          frame_voice_size = 22060 // fps * 4
+        elif fps == 22:
+          frame_voice_size = 22044 // fps * 4
+        elif fps == 24:
+          frame_voice_size = 22056 // fps * 4
         elif fps == 27:
           frame_voice_size = 22059 // fps * 4
         else:
-          frame_voice_size = pcm_freq * 4 // fps
+          frame_voice_size = pcm_freq // fps * 4
       elif pcm_freq == 24000:
         if fps == 18:
           frame_voice_size = 24012 // fps * 4
@@ -253,23 +257,35 @@ class BMPtoISD:
         elif fps == 27:
           frame_voice_size = 24003 // fps * 4
         else:
-          frame_voice_size = pcm_freq * 4 // fps
+          frame_voice_size = pcm_freq // fps * 4
       elif pcm_freq == 32000:
-        if fps == 6 or fps == 12 or fps == 18 or fps == 24:
-          frame_voice_size = 64008 // fps * 2     # 24fps
-        elif fps == 15 or fps == 27 or fps == 30:
-          frame_voice_size = 63990 // fps * 2     # 15/30fps
+        if fps == 6:
+          frame_voice_size = 32004 // fps * 4
+        elif fps == 12:
+          frame_voice_size = 32004 // fps * 4
+        elif fps == 15:
+          frame_voice_size = 31995 // fps * 4
+        elif fps == 18:
+          frame_voice_size = 32004 // fps * 4
         elif fps == 22:
-          frame_voice_size = 63998 // fps * 2
+          frame_voice_size = 31999 // fps * 4
+        elif fps == 24:
+          frame_voice_size = 32004 // fps * 4
+        elif fps == 27:
+          frame_voice_size = 31995 // fps * 4
+        elif fps == 30:
+          frame_voice_size = 32010 // fps * 4
         else:
-          frame_voice_size = 64000 // fps * 2     # 10/20fps
+          frame_voice_size = pcm_freq // fps * 4
       elif pcm_freq == 44100:
         if fps == 22:
           frame_voice_size = 44110 // fps * 4
+        elif fps == 24:
+          frame_voice_size = 44112 // fps * 4
         elif fps == 27:
           frame_voice_size = 44118 // fps * 4
         else:
-          frame_voice_size = pcm_freq * 4 // fps
+          frame_voice_size = pcm_freq // fps * 4
       elif pcm_freq == 48000:
         if fps == 18:
           frame_voice_size = 48006 // fps * 4
@@ -278,7 +294,7 @@ class BMPtoISD:
         elif fps == 27:
           frame_voice_size = 48006 // fps * 4
         else:
-          frame_voice_size = pcm_freq * 4 // fps
+          frame_voice_size = pcm_freq // fps * 4
 
       frame_size = ( 1 + ( view_width * view_height * 2 + frame_voice_size ) // 1024 ) * 1024
       header_size = 1024
