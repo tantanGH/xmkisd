@@ -369,6 +369,7 @@ class BMPtoISD:
           gvram_addr = 0xC00000 + ofs_y * 512 * 2 + ofs_x * 2
           y_delta = 512 * 2
           y_copy = 0
+
           f.write(gvram_addr.to_bytes(4, 'big'))
           f.write(view_width.to_bytes(2, 'big'))
           f.write(view_height.to_bytes(2, 'big'))
@@ -376,8 +377,11 @@ class BMPtoISD:
           f.write(y_copy.to_bytes(4, 'big'))
           f.write(grm_bytes)
           f.write(frame_voice_size.to_bytes(2, 'big'))
-          f.write(pcm_data[written_pcm_size : written_pcm_size + frame_voice_size])
-          f.write(bytes([0] * (frame_size - 16 - len(grm_bytes) - 2 - frame_voice_size)))
+
+          frame_pcm_data = pcm_data[written_pcm_size : written_pcm_size + frame_voice_size]
+          f.write(frame_pcm_data)
+          f.write(bytes([0] * (frame_size - 16 - len(grm_bytes) - 2 - len(frame_pcm_data))))
+
           written_frames += 1
           written_pcm_size += frame_voice_size
           print(".", end="", flush=True)
