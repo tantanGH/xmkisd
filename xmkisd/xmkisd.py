@@ -521,7 +521,7 @@ def main():
   parser.add_argument("-ib", "--use_ibit", help="use i bit for color reduction", action='store_true')
   parser.add_argument("-db", "--deband", help="use debanding filter", action='store_true')
   parser.add_argument("-sp", "--sharpness", help="sharpness (max 1.5)", type=float, default=0.6)
-  parser.add_argument("-cm", "--comment", help="comment", default="build with xmkisd")
+  parser.add_argument("-cm", "--comment", help="comment", default="")
   parser.add_argument("-bm", "--preserve_bmp", help="preserve output bmp folder", action='store_true')
 
   args = parser.parse_args()
