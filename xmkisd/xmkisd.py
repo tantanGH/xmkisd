@@ -203,7 +203,7 @@ class ADPCM:
 #
 class BMPtoISD:
  
-  def convert(self, output_file, src_image_dir, view_width, view_height, use_ibit, fps, square_mode, \
+  def convert(self, output_file, src_image_dir, view_width, view_height, rotate, use_ibit, fps, square_mode, \
               pcm_freq, pcm_wip_file, adpcm_wip_file, comment):
 
     rc = 0
@@ -343,30 +343,61 @@ class BMPtoISD:
           im = Image.open(src_image_dir + os.sep + bmp_name)
 
           im_width, im_height = im.size
-          if im_width != view_width:
+          if rotate >= 1 and im_width != view_height:
+            print("error: bmp width is not same as view height.")
+            return rc
+          if rotate == 0 and im_width != view_width:
             print("error: bmp width is not same as view width.")
             return rc
 
           im_bytes = im.tobytes()
 
-          grm_bytes = bytearray(view_width * view_height * 2)
-          for y in range(im_height):
-            for x in range(im_width):
-              r = im_bytes[ (y * im_width + x) * 3 + 0 ] >> 3
-              g = im_bytes[ (y * im_width + x) * 3 + 1 ] >> 3
-              b = im_bytes[ (y * im_width + x) * 3 + 2 ] >> 3
-              c = (g << 11) | (r << 6) | (b << 1)
-              if use_ibit:
-                ge = im_bytes[ (y * im_width + x) * 3 + 1 ] % 8
-                if ge >= 4:
-                  c += 1
-              else:
-                if c > 0:
-                  c += 1
-              grm_bytes[ y * view_width * 2 + x * 2 + 0 ] = c // 256
-              grm_bytes[ y * view_width * 2 + x * 2 + 1 ] = c % 256
+          if rotate >= 1:
+            grm_bytes = bytearray(view_width * view_height * 2)
+            for y in range(im_width):
+              for x in range(im_height):
+                if rotate == 1:
+                  r = im_bytes[ ((im_height - 1 - x) * im_width + y) * 3 + 0 ] >> 3
+                  g = im_bytes[ ((im_height - 1 - x) * im_width + y) * 3 + 1 ] >> 3
+                  b = im_bytes[ ((im_height - 1 - x) * im_width + y) * 3 + 2 ] >> 3
+                else:
+                  r = im_bytes[ (x * im_width + im_width - 1 - y) * 3 + 0 ] >> 3
+                  g = im_bytes[ (x * im_width + im_width - 1 - y) * 3 + 1 ] >> 3
+                  b = im_bytes[ (x * im_width + im_width - 1 - y) * 3 + 2 ] >> 3
+                c = (g << 11) | (r << 6) | (b << 1)
+                if use_ibit:
+                  if rotate == 1:
+                    ge = im_bytes[ ((im_height - 1 - x) * im_width + y) * 3 + 1 ] % 8
+                  else:
+                    ge = im_bytes[ (x * im_width + im_width - 1 - y) * 3 + 1 ] % 8
+                  if ge >= 4:
+                    c += 1
+                else:
+                  if c > 0:
+                    c += 1
+                grm_bytes[ y * view_width * 2 + x * 2 + 0 ] = c // 256
+                grm_bytes[ y * view_width * 2 + x * 2 + 1 ] = c % 256
+
+          else:
+            grm_bytes = bytearray(view_width * view_height * 2)
+            for y in range(im_height):
+              for x in range(im_width):
+                r = im_bytes[ (y * im_width + x) * 3 + 0 ] >> 3
+                g = im_bytes[ (y * im_width + x) * 3 + 1 ] >> 3
+                b = im_bytes[ (y * im_width + x) * 3 + 2 ] >> 3
+                c = (g << 11) | (r << 6) | (b << 1)
+                if use_ibit:
+                  ge = im_bytes[ (y * im_width + x) * 3 + 1 ] % 8
+                  if ge >= 4:
+                    c += 1
+                else:
+                  if c > 0:
+                    c += 1
+                grm_bytes[ y * view_width * 2 + x * 2 + 0 ] = c // 256
+                grm_bytes[ y * view_width * 2 + x * 2 + 1 ] = c % 256
 
           gvram_addr = 0xC00000 + ofs_y * 512 * 2 + ofs_x * 2
+
           y_delta = 512 * 2
           y_copy = 0
 
@@ -431,9 +462,12 @@ def stage1(src_file, src_cut_ofs, src_cut_len, \
 #
 #  stage2 mov to bmp
 #
-def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, view_height, deband, sharpness, output_bmp_dir):
+def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, view_height, rotate, deband, sharpness, output_bmp_dir):
 
   print("[STAGE 2] started.")
+
+  if rotate:
+    view_width, view_height = view_height, view_width
 
   if view_width % 4 != 0:
     print("error: view_width must be 4 * n")
@@ -488,11 +522,11 @@ def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, vie
 #
 #  stage 3 bmp/pcm to isd
 #
-def stage3(output_bmp_dir, view_width, view_height, use_ibit, fps, square_mode, pcm_freq, pcm_wip_file, adpcm_wip_file, comment, isd_data_file):
+def stage3(output_bmp_dir, view_width, view_height, rotate, use_ibit, fps, square_mode, pcm_freq, pcm_wip_file, adpcm_wip_file, comment, isd_data_file):
 
   print("[STAGE 3] started.")
 
-  if BMPtoISD().convert(isd_data_file, output_bmp_dir, view_width, view_height, use_ibit, fps, square_mode, pcm_freq, pcm_wip_file, adpcm_wip_file, comment) != 0:
+  if BMPtoISD().convert(isd_data_file, output_bmp_dir, view_width, view_height, rotate, use_ibit, fps, square_mode, pcm_freq, pcm_wip_file, adpcm_wip_file, comment) != 0:
     print("error: BMP/PCM to ISD conversion failed.")
     return 1
   
@@ -523,6 +557,7 @@ def main():
   parser.add_argument("-sp", "--sharpness", help="sharpness (max 1.5)", type=float, default=0.6)
   parser.add_argument("-cm", "--comment", help="comment", default="")
   parser.add_argument("-bm", "--preserve_bmp", help="preserve output bmp folder", action='store_true')
+  parser.add_argument("-rt", "--rotate", help="rotate (1:right, 2:left)", type=int, default=0, choices=[0, 1, 2])
 
   args = parser.parse_args()
 
@@ -545,11 +580,11 @@ def main():
     return 1
   
   if stage2(args.src_file, args.src_cut_ofs, args.src_cut_len, \
-            args.fps, args.square_mode, args.view_width, args.view_height, args.deband, args.sharpness, \
+            args.fps, args.square_mode, args.view_width, args.view_height, args.rotate, args.deband, args.sharpness, \
             output_bmp_dir) != 0:
     return 1
 
-  if stage3(output_bmp_dir, args.view_width, args.view_height, args.use_ibit, args.fps, args.square_mode, \
+  if stage3(output_bmp_dir, args.view_width, args.view_height, args.rotate, args.use_ibit, args.fps, args.square_mode, \
             args.pcm_freq, pcm_wip_file, adpcm_wip_file, args.comment, isd_data_file):
     return 1
 
