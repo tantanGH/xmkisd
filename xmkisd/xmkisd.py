@@ -485,7 +485,11 @@ def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, vie
     print("error: view_width is too large.")
     return 1
 
-  if view_height > 256:
+  if rotate >= 1 and view_width > 256:
+    print("error: view_width is too large.")
+    return 1
+
+  if rotate == 0 and view_height > 256:
     print("error: view_height is too large.")
     return 1
 
