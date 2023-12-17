@@ -558,7 +558,7 @@ def main():
   parser.add_argument("-pf", "--pcm_freq", help="pcm frequency", type=int, default=15625, choices=[15625, 22050, 24000, 32000, 44100, 48000])
   parser.add_argument("-ib", "--use_ibit", help="use i bit for color reduction", action='store_true')
   parser.add_argument("-db", "--deband", help="use debanding filter", action='store_true')
-  parser.add_argument("-dt", "--deband_threshold", help="band detection threshold", type=float, default=0.02)
+  parser.add_argument("-dt", "--deband_threshold", help="band detection threshold (0.00003 - 0.5, default:0.02)", type=float, default=0.02)
   parser.add_argument("-sp", "--sharpness", help="sharpness (max 1.5)", type=float, default=0.6)
   parser.add_argument("-cm", "--comment", help="comment", default="")
   parser.add_argument("-bm", "--preserve_bmp", help="preserve output bmp folder", action='store_true')
