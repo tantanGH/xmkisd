@@ -462,7 +462,7 @@ def stage1(src_file, src_cut_ofs, src_cut_len, \
 #
 #  stage2 mov to bmp
 #
-def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, view_height, rotate, deband, deband_threshold, sharpness, output_bmp_dir):
+def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, view_height, rotate, deband, deband_threshold, deband_range, sharpness, output_bmp_dir):
 
   print("[STAGE 2] started.")
 
@@ -505,7 +505,7 @@ def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, vie
     sharpness_filter=""
   
   if deband:
-    deband_filter=f",deband=1thr={deband_threshold}:2thr={deband_threshold}:3thr={deband_threshold}:blur=1"
+    deband_filter=f",deband=1thr={deband_threshold}:2thr={deband_threshold}:3thr={deband_threshold}:range={deband_range}:blur=1"
     deband_filter2="-pix_fmt rgb565"
   else:
     deband_filter=""
@@ -559,6 +559,7 @@ def main():
   parser.add_argument("-ib", "--use_ibit", help="use i bit for color reduction", action='store_true')
   parser.add_argument("-db", "--deband", help="use debanding filter", action='store_true')
   parser.add_argument("-dt", "--deband_threshold", help="band detection threshold (0.00003 - 0.5, default:0.02)", type=float, default=0.02)
+  parser.add_argument("-dr", "--deband_range", help="band detection range pixels (default:8)", type=int, default=8)
   parser.add_argument("-sp", "--sharpness", help="sharpness (max 1.5)", type=float, default=0.6)
   parser.add_argument("-cm", "--comment", help="comment", default="")
   parser.add_argument("-bm", "--preserve_bmp", help="preserve output bmp folder", action='store_true')
@@ -585,7 +586,7 @@ def main():
     return 1
   
   if stage2(args.src_file, args.src_cut_ofs, args.src_cut_len, \
-            args.fps, args.square_mode, args.view_width, args.view_height, args.rotate, args.deband, args.deband_threshold, args.sharpness, \
+            args.fps, args.square_mode, args.view_width, args.view_height, args.rotate, args.deband, args.deband_threshold, args.deband_range, args.sharpness, \
             output_bmp_dir) != 0:
     return 1
 
