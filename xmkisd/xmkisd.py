@@ -462,7 +462,7 @@ def stage1(src_file, src_cut_ofs, src_cut_len, \
 #
 #  stage2 mov to bmp
 #
-def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, view_height, rotate, deband, sharpness, output_bmp_dir):
+def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, view_height, rotate, deband, deband_threshold, sharpness, output_bmp_dir):
 
   print("[STAGE 2] started.")
 
@@ -505,7 +505,7 @@ def stage2(src_file, src_cut_ofs, src_cut_len, fps, square_mode, view_width, vie
     sharpness_filter=""
   
   if deband:
-    deband_filter=",deband=1thr=0.02:2thr=0.02:3thr=0.02:blur=1"
+    deband_filter=f",deband=1thr={deband_threshold}:2thr={deband_threshold}:3thr={deband_threshold}:blur=1"
     deband_filter2="-pix_fmt rgb565"
   else:
     deband_filter=""
@@ -558,6 +558,7 @@ def main():
   parser.add_argument("-pf", "--pcm_freq", help="pcm frequency", type=int, default=15625, choices=[15625, 22050, 24000, 32000, 44100, 48000])
   parser.add_argument("-ib", "--use_ibit", help="use i bit for color reduction", action='store_true')
   parser.add_argument("-db", "--deband", help="use debanding filter", action='store_true')
+  parser.add_argument("-dt", "--deband_threshold", help="band detection threshold", type=float, default=0.02)
   parser.add_argument("-sp", "--sharpness", help="sharpness (max 1.5)", type=float, default=0.6)
   parser.add_argument("-cm", "--comment", help="comment", default="")
   parser.add_argument("-bm", "--preserve_bmp", help="preserve output bmp folder", action='store_true')
@@ -584,7 +585,7 @@ def main():
     return 1
   
   if stage2(args.src_file, args.src_cut_ofs, args.src_cut_len, \
-            args.fps, args.square_mode, args.view_width, args.view_height, args.rotate, args.deband, args.sharpness, \
+            args.fps, args.square_mode, args.view_width, args.view_height, args.rotate, args.deband, args.deband_threshold, args.sharpness, \
             output_bmp_dir) != 0:
     return 1
 
